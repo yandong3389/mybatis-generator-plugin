@@ -38,64 +38,64 @@ public class MybatisServicePlugin extends PluginAdapter {
 	private String project;
 	private String pojoUrl;
 
-	private List<Method> methods;
+	private List<MyMethod> methods;
 	/**
 	 * 是否添加注解
 	 */
-	private boolean enableAnnotation = true;
-	private boolean enableInsert = true;
-	private boolean enableInsertSelective = true;
-	private boolean enableDeleteByPrimaryKey = true;
-	private boolean enableDeleteByExample = true;
-	private boolean enableUpdateByExample = true;
-	private boolean enableUpdateByExampleSelective = true;
-	private boolean enableUpdateByPrimaryKey = true;
-	private boolean enableUpdateByPrimaryKeySelective = true;
+	private boolean enableAnnotation = false;
+	private boolean enableInsert = false;
+	private boolean enableInsertSelective = false;
+	private boolean enableDeleteByPrimaryKey = false;
+	private boolean enableDeleteByExample = false;
+	private boolean enableUpdateByExample = false;
+	private boolean enableUpdateByExampleSelective = false;
+	private boolean enableUpdateByPrimaryKey = false;
+	private boolean enableUpdateByPrimaryKeySelective = false;
 
 	public MybatisServicePlugin() {
 		super();
 		// 默认是slf4j
 		slf4jLogger = new FullyQualifiedJavaType("org.slf4j.Logger");
 		slf4jLoggerFactory = new FullyQualifiedJavaType("org.slf4j.LoggerFactory");
-		methods = new ArrayList<Method>();
+		methods = new ArrayList<MyMethod>();
 	}
 
 	public boolean validate(List<String> warnings) {
-//		if (StringUtility.stringHasValue(properties.getProperty("enableAnnotation")))
-//			enableAnnotation = StringUtility.isTrue(properties.getProperty("enableAnnotation"));
+		if (StringUtility.stringHasValue(properties.getProperty("enableAnnotation")))
+			enableAnnotation = StringUtility.isTrue(properties.getProperty("enableAnnotation"));
 
-//		String enableInsert = properties.getProperty("enableInsert");
-//
-//		String enableUpdateByExampleSelective = properties.getProperty("enableUpdateByExampleSelective");
-//
-//		String enableInsertSelective = properties.getProperty("enableInsertSelective");
-//
-//		String enableUpdateByPrimaryKey = properties.getProperty("enableUpdateByPrimaryKey");
-//
-//		String enableDeleteByPrimaryKey = properties.getProperty("enableDeleteByPrimaryKey");
-//
-//		String enableDeleteByExample = properties.getProperty("enableDeleteByExample");
-//
-//		String enableUpdateByPrimaryKeySelective = properties.getProperty("enableUpdateByPrimaryKeySelective");
-//
-//		String enableUpdateByExample = properties.getProperty("enableUpdateByExample");
+		String enableInsert = properties.getProperty("enableInsert");
 
-//		if (StringUtility.stringHasValue(enableInsert))
-//			this.enableInsert = StringUtility.isTrue(enableInsert);
-//		if (StringUtility.stringHasValue(enableUpdateByExampleSelective))
-//			this.enableUpdateByExampleSelective = StringUtility.isTrue(enableUpdateByExampleSelective);
-//		if (StringUtility.stringHasValue(enableInsertSelective))
-//			this.enableInsertSelective = StringUtility.isTrue(enableInsertSelective);
-//		if (StringUtility.stringHasValue(enableUpdateByPrimaryKey))
-//			this.enableUpdateByPrimaryKey = StringUtility.isTrue(enableUpdateByPrimaryKey);
-//		if (StringUtility.stringHasValue(enableDeleteByPrimaryKey))
-//			this.enableDeleteByPrimaryKey = StringUtility.isTrue(enableDeleteByPrimaryKey);
-//		if (StringUtility.stringHasValue(enableDeleteByExample))
-//			this.enableDeleteByExample = StringUtility.isTrue(enableDeleteByExample);
-//		if (StringUtility.stringHasValue(enableUpdateByPrimaryKeySelective))
-//			this.enableUpdateByPrimaryKeySelective = StringUtility.isTrue(enableUpdateByPrimaryKeySelective);
-//		if (StringUtility.stringHasValue(enableUpdateByExample))
-//			this.enableUpdateByExample = StringUtility.isTrue(enableUpdateByExample);
+		String enableUpdateByExampleSelective = properties.getProperty("enableUpdateByExampleSelective");
+
+		String enableInsertSelective = properties.getProperty("enableInsertSelective");
+
+		String enableUpdateByPrimaryKey = properties.getProperty("enableUpdateByPrimaryKey");
+
+		String enableDeleteByPrimaryKey = properties.getProperty("enableDeleteByPrimaryKey");
+
+		String enableDeleteByExample = properties.getProperty("enableDeleteByExample");
+
+		String enableUpdateByPrimaryKeySelective = properties.getProperty("enableUpdateByPrimaryKeySelective");
+
+		String enableUpdateByExample = properties.getProperty("enableUpdateByExample");
+
+		if (StringUtility.stringHasValue(enableInsert))
+			this.enableInsert = StringUtility.isTrue(enableInsert);
+		if (StringUtility.stringHasValue(enableUpdateByExampleSelective))
+			this.enableUpdateByExampleSelective = StringUtility.isTrue(enableUpdateByExampleSelective);
+		if (StringUtility.stringHasValue(enableInsertSelective))
+			this.enableInsertSelective = StringUtility.isTrue(enableInsertSelective);
+		if (StringUtility.stringHasValue(enableUpdateByPrimaryKey))
+			this.enableUpdateByPrimaryKey = StringUtility.isTrue(enableUpdateByPrimaryKey);
+		if (StringUtility.stringHasValue(enableDeleteByPrimaryKey))
+			this.enableDeleteByPrimaryKey = StringUtility.isTrue(enableDeleteByPrimaryKey);
+		if (StringUtility.stringHasValue(enableDeleteByExample))
+			this.enableDeleteByExample = StringUtility.isTrue(enableDeleteByExample);
+		if (StringUtility.stringHasValue(enableUpdateByPrimaryKeySelective))
+			this.enableUpdateByPrimaryKeySelective = StringUtility.isTrue(enableUpdateByPrimaryKeySelective);
+		if (StringUtility.stringHasValue(enableUpdateByExample))
+			this.enableUpdateByExample = StringUtility.isTrue(enableUpdateByExample);
 
 		servicePack = properties.getProperty("targetPackage");
 		serviceImplPack = properties.getProperty("implementationPackage");
@@ -125,7 +125,12 @@ public class MybatisServicePlugin extends PluginAdapter {
 
 		pojoType = new FullyQualifiedJavaType(pojoUrl + "." + tableName);
 
-		pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + "Criteria");
+		// TODO 1.3.2 与1.3.1有区别
+//		pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + "Criteria");
+		
+		// 1.3.2方式
+		pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + tableName + "Example");
+		
 		listType = new FullyQualifiedJavaType("java.util.List");
 		Interface interface1 = new Interface(interfaceType);
 		TopLevelClass topLevelClass = new TopLevelClass(serviceType);
@@ -152,56 +157,57 @@ public class MybatisServicePlugin extends PluginAdapter {
 		interface1.setVisibility(JavaVisibility.PUBLIC);
 
 		// 添加方法
-		Method method = countByExample(introspectedTable, tableName);
-//		method.removeAllBodyLines();
+		MyMethod method = countByExample(introspectedTable, tableName);
+		
+		method.removeAllBodyLines();
 		interface1.addMethod(method);
 
 		method = selectByPrimaryKey(introspectedTable, tableName);
-//		method.removeAllBodyLines();
+		method.removeAllBodyLines();
 		interface1.addMethod(method);
 
 		method = selectByExample(introspectedTable, tableName);
-//		method.removeAllBodyLines();
+		method.removeAllBodyLines();
 		interface1.addMethod(method);
 
 		if (enableDeleteByPrimaryKey) {
 			method = getOtherInteger("deleteByPrimaryKey", introspectedTable, tableName, 2);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 		if (enableUpdateByPrimaryKeySelective) {
 			method = getOtherInteger("updateByPrimaryKeySelective", introspectedTable, tableName, 1);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 		if (enableUpdateByPrimaryKey) {
 			method = getOtherInteger("updateByPrimaryKey", introspectedTable, tableName, 1);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 		if (enableDeleteByExample) {
 			method = getOtherInteger("deleteByExample", introspectedTable, tableName, 3);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 		if (enableUpdateByExampleSelective) {
 			method = getOtherInteger("updateByExampleSelective", introspectedTable, tableName, 4);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 		if (enableUpdateByExample) {
 			method = getOtherInteger("updateByExample", introspectedTable, tableName, 4);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 		if (enableInsert) {
 			method = getOtherInsertboolean("insert", introspectedTable, tableName);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 		if (enableInsertSelective) {
 			method = getOtherInsertboolean("insertSelective", introspectedTable, tableName);
-//			method.removeAllBodyLines();
+			method.removeAllBodyLines();
 			interface1.addMethod(method);
 		}
 // TODO 
@@ -287,8 +293,8 @@ public class MybatisServicePlugin extends PluginAdapter {
 	 * 添加方法
 	 * 
 	 */
-	protected Method selectByPrimaryKey(IntrospectedTable introspectedTable, String tableName) {
-		Method method = new Method();
+	protected MyMethod selectByPrimaryKey(IntrospectedTable introspectedTable, String tableName) {
+		MyMethod method = new MyMethod();
 		method.setName("selectByPrimaryKey");
 		method.setReturnType(pojoType);
 		if (introspectedTable.getRules().generatePrimaryKeyClass()) {
@@ -325,8 +331,8 @@ public class MybatisServicePlugin extends PluginAdapter {
 	 * 添加方法
 	 * 
 	 */
-	protected Method countByExample(IntrospectedTable introspectedTable, String tableName) {
-		Method method = new Method();
+	protected MyMethod countByExample(IntrospectedTable introspectedTable, String tableName) {
+		MyMethod method = new MyMethod();
 		method.setName("countByExample");
 		method.setReturnType(FullyQualifiedJavaType.getIntInstance());
 		method.addParameter(new Parameter(pojoCriteriaType, "example"));
@@ -348,8 +354,8 @@ public class MybatisServicePlugin extends PluginAdapter {
 	 * 添加方法
 	 * 
 	 */
-	protected Method selectByExample(IntrospectedTable introspectedTable, String tableName) {
-		Method method = new Method();
+	protected MyMethod selectByExample(IntrospectedTable introspectedTable, String tableName) {
+		MyMethod method = new MyMethod();
 		method.setName("selectByExample");
 		method.setReturnType(new FullyQualifiedJavaType("List<" + tableName + ">"));
 		method.addParameter(new Parameter(pojoCriteriaType, "example"));
@@ -373,8 +379,8 @@ public class MybatisServicePlugin extends PluginAdapter {
 	 * 添加方法
 	 * 
 	 */
-	protected Method getOtherInteger(String methodName, IntrospectedTable introspectedTable, String tableName, int type) {
-		Method method = new Method();
+	protected MyMethod getOtherInteger(String methodName, IntrospectedTable introspectedTable, String tableName, int type) {
+		MyMethod method = new MyMethod();
 		method.setName(methodName);
 		method.setReturnType(FullyQualifiedJavaType.getIntInstance());
 		String params = addParams(introspectedTable, method, type);
@@ -401,8 +407,8 @@ public class MybatisServicePlugin extends PluginAdapter {
 	 * 添加方法
 	 * 
 	 */
-	protected Method getOtherInsertboolean(String methodName, IntrospectedTable introspectedTable, String tableName) {
-		Method method = new Method();
+	protected MyMethod getOtherInsertboolean(String methodName, IntrospectedTable introspectedTable, String tableName) {
+		MyMethod method = new MyMethod();
 		method.setName(methodName);
 		method.setReturnType(returnType);
 		method.addParameter(new Parameter(pojoType, "record"));
@@ -498,28 +504,28 @@ public class MybatisServicePlugin extends PluginAdapter {
 	 * 
 	 */
 	protected void addMethod(TopLevelClass topLevelClass) {
-		Method method = new Method();
+		MyMethod method = new MyMethod();
 		method.setVisibility(JavaVisibility.PUBLIC);
 		method.setName("setSuccess");
 		method.addParameter(new Parameter(FullyQualifiedJavaType.getBooleanPrimitiveInstance(), "success"));
 		method.addBodyLine("this.success = success;");
 		topLevelClass.addMethod(method);
 
-		method = new Method();
+		method = new MyMethod();
 		method.setVisibility(JavaVisibility.PUBLIC);
 		method.setReturnType(FullyQualifiedJavaType.getBooleanPrimitiveInstance());
 		method.setName("isSuccess");
 		method.addBodyLine("return success;");
 		topLevelClass.addMethod(method);
 
-		method = new Method();
+		method = new MyMethod();
 		method.setVisibility(JavaVisibility.PUBLIC);
 		method.setName("setMessage");
 		method.addParameter(new Parameter(FullyQualifiedJavaType.getStringInstance(), "message"));
 		method.addBodyLine("this.message = message;");
 		topLevelClass.addMethod(method);
 
-		method = new Method();
+		method = new MyMethod();
 		method.setVisibility(JavaVisibility.PUBLIC);
 		method.setReturnType(FullyQualifiedJavaType.getStringInstance());
 		method.setName("getMessage");
@@ -532,9 +538,9 @@ public class MybatisServicePlugin extends PluginAdapter {
 	 * 
 	 */
 	protected void addMethod(TopLevelClass topLevelClass, String tableName) {
-		Method method2 = new Method();
+		MyMethod method2 = new MyMethod();
 		for (int i = 0; i < methods.size(); i++) {
-			Method method = new Method();
+			MyMethod method = new MyMethod();
 			method2 = methods.get(i);
 			method = method2;
 			// TODO 
