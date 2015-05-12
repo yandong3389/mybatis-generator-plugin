@@ -56,6 +56,13 @@
 //
 //		pojoUrl = context.getJavaModelGeneratorConfiguration().getTargetPackage();
 //
+//		System.out.println("*****************************");
+//		System.out.println("servicePack = " + servicePack);
+//		System.out.println("serviceImplPack = " + serviceImplPack);
+//		System.out.println("project = " + project);
+//		System.out.println("pojoUrl = " + pojoUrl);
+//		System.out.println("*****************************");
+//		
 //		return true;
 //	}
 //
@@ -66,16 +73,36 @@
 //		String tableName = table.replaceAll(this.pojoUrl + ".", "");
 //		interfaceType = new FullyQualifiedJavaType(servicePack + "." + tableName + "Service");
 //
+//		
+//		System.out.println("*****************************");
+//		System.out.println("table = " + table);
+//		System.out.println("tableName = " + tableName);
+//		
 //		// 表名
 //		
 //		// 字段类型
 //		
 //		// 字段名称(字段中文名称)
 //		
-//		// Controller文件名称
+//		List<IntrospectedColumn> columns = introspectedTable.getAllColumns();
+//		
+//		
+//		// Controller文件名称、类名称
+//		String controllerName = "Back" + tableName + "Controller";
+//		String controllerFileName = "Back" + tableName + "Controller.java";
 //		// JSP文件名称
+//		String jspName = tableName + "_list.jsp";
+//		
+//		System.out.println("controllerName = " + controllerName);
+//		System.out.println("controllerFileName = " + controllerFileName);
+//		System.out.println("jspName = " + jspName);
+//		
 //		// Controller类：类包、包引用、类名、List名称、activeFlag名称、方法名称
 //		// JSP：List名称、对象名称、字段名称(类属性名称)
+//		String objListName = tableName + "List";
+//		String objName = tableName + "Obj";
+//		System.out.println("objListName = " + objListName);
+//		System.out.println("objName = " + objName);
 //		// left
 //		
 //		// mybatis
