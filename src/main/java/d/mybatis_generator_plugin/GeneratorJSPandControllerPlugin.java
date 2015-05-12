@@ -1,127 +1,138 @@
-//package d.mybatis_generator_plugin;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//import org.mybatis.generator.api.GeneratedJavaFile;
-//import org.mybatis.generator.api.IntrospectedColumn;
-//import org.mybatis.generator.api.IntrospectedTable;
-//import org.mybatis.generator.api.PluginAdapter;
-//import org.mybatis.generator.api.dom.java.Field;
-//import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
-//import org.mybatis.generator.api.dom.java.Interface;
-//import org.mybatis.generator.api.dom.java.JavaElement;
-//import org.mybatis.generator.api.dom.java.JavaVisibility;
-//import org.mybatis.generator.api.dom.java.Method;
-//import org.mybatis.generator.api.dom.java.Parameter;
-//import org.mybatis.generator.api.dom.java.TopLevelClass;
-//import org.mybatis.generator.internal.util.StringUtility;
-//
-///**
-// * 生成service类
-// */
-//public class GeneratorJSPandControllerPlugin extends PluginAdapter {
-//
-//	private FullyQualifiedJavaType slf4jLogger;
-//	private FullyQualifiedJavaType slf4jLoggerFactory;
-//	private FullyQualifiedJavaType serviceType;
-//	private FullyQualifiedJavaType daoType;
-//	private FullyQualifiedJavaType interfaceType;
-//	private FullyQualifiedJavaType pojoType;
-//	private FullyQualifiedJavaType pojoCriteriaType;
-//	private FullyQualifiedJavaType listType;
-//	private FullyQualifiedJavaType autowired;
-//	private FullyQualifiedJavaType service;
-//	private FullyQualifiedJavaType returnType;
-//	private String servicePack;
-//	private String serviceImplPack;
-//	private String project;
-//	private String pojoUrl;
-//
-//	private List<MyMethod> methods;
-//
-//	public GeneratorJSPandControllerPlugin() {
-//		super();
-//		// 默认是slf4j
-//		slf4jLogger = new FullyQualifiedJavaType("org.slf4j.Logger");
-//		slf4jLoggerFactory = new FullyQualifiedJavaType("org.slf4j.LoggerFactory");
-//		methods = new ArrayList<MyMethod>();
-//	}
-//
-//	public boolean validate(List<String> warnings) {
-//
-//		servicePack = properties.getProperty("targetPackage");
-//		serviceImplPack = properties.getProperty("implementationPackage");
-//		project = properties.getProperty("targetProject");
-//
-//		pojoUrl = context.getJavaModelGeneratorConfiguration().getTargetPackage();
-//
-//		System.out.println("*****************************");
-//		System.out.println("servicePack = " + servicePack);
-//		System.out.println("serviceImplPack = " + serviceImplPack);
-//		System.out.println("project = " + project);
-//		System.out.println("pojoUrl = " + pojoUrl);
-//		System.out.println("*****************************");
-//		
-//		return true;
-//	}
-//
-//	@Override
-//	public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
-//		List<GeneratedJavaFile> files = new ArrayList<GeneratedJavaFile>();
-//		String table = introspectedTable.getBaseRecordType();
-//		String tableName = table.replaceAll(this.pojoUrl + ".", "");
-//		interfaceType = new FullyQualifiedJavaType(servicePack + "." + tableName + "Service");
-//
-//		
-//		System.out.println("*****************************");
-//		System.out.println("table = " + table);
-//		System.out.println("tableName = " + tableName);
-//		
-//		// 表名
-//		
-//		// 字段类型
-//		
-//		// 字段名称(字段中文名称)
-//		
-//		List<IntrospectedColumn> columns = introspectedTable.getAllColumns();
-//		
-//		
-//		// Controller文件名称、类名称
-//		String controllerName = "Back" + tableName + "Controller";
-//		String controllerFileName = "Back" + tableName + "Controller.java";
-//		// JSP文件名称
-//		String jspName = tableName + "_list.jsp";
-//		
-//		System.out.println("controllerName = " + controllerName);
-//		System.out.println("controllerFileName = " + controllerFileName);
-//		System.out.println("jspName = " + jspName);
-//		
-//		// Controller类：类包、包引用、类名、List名称、activeFlag名称、方法名称
-//		// JSP：List名称、对象名称、字段名称(类属性名称)
-//		String objListName = tableName + "List";
-//		String objName = tableName + "Obj";
-//		System.out.println("objListName = " + objListName);
-//		System.out.println("objName = " + objName);
-//		// left
-//		
-//		// mybatis
-//		daoType = new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType());
-//
-//		// logger.info(toLowerCase(daoType.getShortName()));
-//		serviceType = new FullyQualifiedJavaType(serviceImplPack + "." + tableName + "ServiceImpl");
-//
-//		pojoType = new FullyQualifiedJavaType(pojoUrl + "." + tableName);
-//
-//		// TODO 1.3.2 与1.3.1有区别
-////		pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + "Criteria");
-//		
-//		// 1.3.2方式
-//		pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + tableName + "Example");
-//		
-//		listType = new FullyQualifiedJavaType("java.util.List");
-//		Interface interface1 = new Interface(interfaceType);
-//		TopLevelClass topLevelClass = new TopLevelClass(serviceType);
+package d.mybatis_generator_plugin;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mybatis.generator.api.GeneratedJavaFile;
+import org.mybatis.generator.api.IntrospectedColumn;
+import org.mybatis.generator.api.IntrospectedTable;
+import org.mybatis.generator.api.PluginAdapter;
+import org.mybatis.generator.api.dom.java.Field;
+import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
+import org.mybatis.generator.api.dom.java.Interface;
+import org.mybatis.generator.api.dom.java.JavaElement;
+import org.mybatis.generator.api.dom.java.JavaVisibility;
+import org.mybatis.generator.api.dom.java.Method;
+import org.mybatis.generator.api.dom.java.Parameter;
+import org.mybatis.generator.api.dom.java.TopLevelClass;
+import org.mybatis.generator.internal.util.StringUtility;
+
+/**
+ * 生成service类
+ */
+public class GeneratorJSPandControllerPlugin extends PluginAdapter {
+
+	private FullyQualifiedJavaType slf4jLogger;
+	private FullyQualifiedJavaType slf4jLoggerFactory;
+	private FullyQualifiedJavaType serviceType;
+	private FullyQualifiedJavaType daoType;
+	private FullyQualifiedJavaType interfaceType;
+	private FullyQualifiedJavaType pojoType;
+	private FullyQualifiedJavaType pojoCriteriaType;
+	private FullyQualifiedJavaType listType;
+	private FullyQualifiedJavaType autowired;
+	private FullyQualifiedJavaType service;
+	private FullyQualifiedJavaType returnType;
+	private String servicePack;
+	private String serviceImplPack;
+	private String project;
+	private String pojoUrl;
+
+	private List<MyMethod> methods;
+
+	public GeneratorJSPandControllerPlugin() {
+		super();
+		// 默认是slf4j
+		slf4jLogger = new FullyQualifiedJavaType("org.slf4j.Logger");
+		slf4jLoggerFactory = new FullyQualifiedJavaType("org.slf4j.LoggerFactory");
+		methods = new ArrayList<MyMethod>();
+	}
+
+	public boolean validate(List<String> warnings) {
+
+		servicePack = properties.getProperty("targetPackage");
+		serviceImplPack = properties.getProperty("implementationPackage");
+		project = properties.getProperty("targetProject");
+
+		pojoUrl = context.getJavaModelGeneratorConfiguration().getTargetPackage();
+
+		System.out.println("*****************************");
+		System.out.println("servicePack = " + servicePack);
+		System.out.println("serviceImplPack = " + serviceImplPack);
+		System.out.println("project = " + project);
+		System.out.println("pojoUrl = " + pojoUrl);
+		System.out.println("*****************************");
+		
+		return true;
+	}
+
+	@Override
+	public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
+		List<GeneratedJavaFile> files = new ArrayList<GeneratedJavaFile>();
+		String table = introspectedTable.getBaseRecordType();
+		String tableName = table.replaceAll(this.pojoUrl + ".", "");
+		interfaceType = new FullyQualifiedJavaType(servicePack + "." + tableName + "Service");
+
+		
+		System.out.println("*****************************");
+		System.out.println("table = " + table);
+		System.out.println("tableName = " + tableName);
+		
+		// 表名
+		
+		// 字段类型
+		
+		// 字段名称(字段中文名称)
+		
+		List<IntrospectedColumn> columns = introspectedTable.getAllColumns();
+		
+		for (IntrospectedColumn introspectedColumn : columns) {
+			
+			System.out.print("columns = " + introspectedColumn.getJdbcTypeName());
+			System.out.print("    " + introspectedColumn.getJavaProperty());
+			System.out.print("    " + introspectedColumn.getFullyQualifiedJavaType().getShortName());
+			System.out.print("    " + introspectedColumn.getFullyQualifiedJavaType().getPackageName());
+			System.out.print("    " + introspectedColumn.getFullyQualifiedJavaType().getFullyQualifiedName());
+			System.out.print("    " + introspectedColumn.getFullyQualifiedJavaType().getImportList());
+			System.out.println();
+		}
+		
+		
+		// Controller文件名称、类名称
+		String controllerName = "Back" + tableName + "Controller";
+		String controllerFileName = "Back" + tableName + "Controller.java";
+		// JSP文件名称
+		String jspName = tableName + "_list.jsp";
+		
+		System.out.println("controllerName = " + controllerName);
+		System.out.println("controllerFileName = " + controllerFileName);
+		System.out.println("jspName = " + jspName);
+		
+		// Controller类：类包、包引用、类名、List名称、activeFlag名称、方法名称
+		// JSP：List名称、对象名称、字段名称(类属性名称)
+		String objListName = tableName + "List";
+		String objName = tableName + "Obj";
+		System.out.println("objListName = " + objListName);
+		System.out.println("objName = " + objName);
+		// left
+		
+		// mybatis
+		daoType = new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType());
+
+		// logger.info(toLowerCase(daoType.getShortName()));
+		serviceType = new FullyQualifiedJavaType(serviceImplPack + "." + tableName + "ServiceImpl");
+
+		pojoType = new FullyQualifiedJavaType(pojoUrl + "." + tableName);
+
+		// TODO 1.3.2 与1.3.1有区别
+//		pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + "Criteria");
+		
+		// 1.3.2方式
+		pojoCriteriaType = new FullyQualifiedJavaType(pojoUrl + "." + tableName + "Example");
+		
+		listType = new FullyQualifiedJavaType("java.util.List");
+		Interface interface1 = new Interface(interfaceType);
+		TopLevelClass topLevelClass = new TopLevelClass(serviceType);
 //		// 导入必要的类
 //		addImport(interface1, topLevelClass);
 //
@@ -130,10 +141,27 @@
 //		// 实现类
 //		addServiceImpl(topLevelClass,introspectedTable, tableName, files);
 //		addLogger(topLevelClass);
-//
-//		return files;
-//	}
-//
+
+		return files;
+	}
+	
+	
+//	table = d.money.pojo.base.BaseQuTag
+//	tableName = BaseQuTag
+//	columns = CHAR    quTagId    String    java.lang    java.lang.String    []
+//	columns = VARCHAR    quTagName    String    java.lang    java.lang.String    []
+//	columns = VARCHAR    quTagFlag    String    java.lang    java.lang.String    []
+//	columns = CHAR    quTypeId    String    java.lang    java.lang.String    []
+//	columns = DECIMAL    useCount    Long    java.lang    java.lang.Long    []
+//	columns = VARCHAR    createFlag    String    java.lang    java.lang.String    []
+//	columns = TIMESTAMP    createDate    Date    java.util    java.util.Date    [java.util.Date]
+//	columns = CHAR    userId    String    java.lang    java.lang.String    []
+//	controllerName = BackBaseQuTagController
+//	controllerFileName = BackBaseQuTagController.java
+//	jspName = BaseQuTag_list.jsp
+//	objListName = BaseQuTagList
+//	objName = BaseQuTagObj
+
 //	/**
 //	 * 添加接口
 //	 * 
@@ -617,4 +645,4 @@
 //		returnType = method.getReturnType();
 //		return true;
 //	}
-//}
+}
