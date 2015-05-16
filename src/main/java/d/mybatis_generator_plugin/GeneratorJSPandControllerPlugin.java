@@ -1,7 +1,9 @@
 package d.mybatis_generator_plugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.IntrospectedColumn;
@@ -16,6 +18,12 @@ import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.internal.util.StringUtility;
+
+import com.alibaba.fastjson.JSONObject;
+
+import d.util.StringUtil;
+import d.util.VMUtil;
+import d.util.VelocityUtil;
 
 /**
  * 生成service类
@@ -73,11 +81,6 @@ public class GeneratorJSPandControllerPlugin extends PluginAdapter {
 		String tableName = table.replaceAll(this.pojoUrl + ".", "");
 		interfaceType = new FullyQualifiedJavaType(servicePack + "." + tableName + "Service");
 
-		
-		System.out.println("*****************************");
-		System.out.println("table = " + table);
-		System.out.println("tableName = " + tableName);
-		
 		// 表名
 		
 		// 字段类型
@@ -96,25 +99,6 @@ public class GeneratorJSPandControllerPlugin extends PluginAdapter {
 			System.out.print("    " + introspectedColumn.getFullyQualifiedJavaType().getImportList());
 			System.out.println();
 		}
-		
-		
-		// Controller文件名称、类名称
-		String controllerName = "Back" + tableName + "Controller";
-		String controllerFileName = "Back" + tableName + "Controller.java";
-		// JSP文件名称
-		String jspName = tableName + "_list.jsp";
-		
-		System.out.println("controllerName = " + controllerName);
-		System.out.println("controllerFileName = " + controllerFileName);
-		System.out.println("jspName = " + jspName);
-		
-		// Controller类：类包、包引用、类名、List名称、activeFlag名称、方法名称
-		// JSP：List名称、对象名称、字段名称(类属性名称)
-		String objListName = tableName + "List";
-		String objName = tableName + "Obj";
-		System.out.println("objListName = " + objListName);
-		System.out.println("objName = " + objName);
-		// left
 		
 		// mybatis
 		daoType = new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType());
@@ -142,9 +126,117 @@ public class GeneratorJSPandControllerPlugin extends PluginAdapter {
 //		addServiceImpl(topLevelClass,introspectedTable, tableName, files);
 //		addLogger(topLevelClass);
 
+		genFiles(introspectedTable);
+		
 		return files;
 	}
 	
+	/**
+	// 获得模块引擎
+	// 获得模板路径
+	// 获得指定模板
+	// 抽取表结构数据
+	
+	// 填充表结构数据到JSP模板（list、add、update），生成内容
+	// 将生成的JSP内容输出到文件，JSP文件后缀以list、add、update为命名（add和update考虑使用同一个文件）
+	// 填充表结构数据到Controller模板（package、import、class、anno、method），生成内容
+	// 真生成的Controller内容输出到文件，以.java为后缀，名称方式为 tableName + Colltroller.java
+	 * 
+	 */
+	public void genFiles(IntrospectedTable introspectedTable){
+		   
+		genController(introspectedTable);
+		
+	}
+	
+	public void genController(IntrospectedTable introspectedTable){
+		
+		String fullPojoJavaName = introspectedTable.getBaseRecordType();
+		String pojoJavaName = fullPojoJavaName.replaceAll(this.pojoUrl + ".", "");
+		String pojoObjName = StringUtil.toFirstLowerClass(pojoJavaName);
+		
+		String fullPojoExampleJavaName = fullPojoJavaName + "Example";
+		String pojoExampleJavaName = fullPojoExampleJavaName.replaceAll(this.pojoUrl + ".", "");
+		String pojoExampleObjName = StringUtil.toFirstLowerClass(pojoExampleJavaName);
+		
+		String pojoObjListName = pojoObjName + "List";
+		
+		String serviceJavaName = pojoJavaName + "Service";
+		String serviceObjName = StringUtil.toFirstLowerClass(serviceJavaName);
+		String fullServiceJavaName = "d.money.service.base." + serviceJavaName;
+		
+		String controllerName = "Back" + pojoJavaName + "Controller"; 
+		
+		String table_name = introspectedTable.getTableConfiguration().getTableName();
+		
+		
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		
+		paramMap.put("fullPojoJavaName", fullPojoJavaName);
+		paramMap.put("pojoJavaName", pojoJavaName);
+		paramMap.put("pojoObjName", pojoObjName);
+		paramMap.put("fullPojoExampleJavaName", fullPojoExampleJavaName);
+		paramMap.put("pojoExampleJavaName", pojoExampleJavaName);
+		paramMap.put("pojoExampleObjName", pojoExampleObjName);
+		paramMap.put("pojoObjListName", pojoObjListName);
+		paramMap.put("serviceJavaName", serviceJavaName);
+		paramMap.put("serviceObjName", serviceObjName);
+		paramMap.put("fullServiceJavaName", fullServiceJavaName);
+		paramMap.put("controllerName", controllerName);
+		paramMap.put("table_name", table_name);
+
+		paramMap.put("util", new VMUtil());
+		
+		List<String> pojoFieldList = new ArrayList<String>();
+		
+		List<IntrospectedColumn> columns = introspectedTable.getAllColumns();
+		
+		for (IntrospectedColumn column : columns) {
+			
+			
+			System.out.println(JSONObject.toJSONString(column));
+			
+			pojoFieldList.add(column.getJavaProperty());
+			
+		}
+		paramMap.put("pojoFieldList", pojoFieldList);
+		paramMap.put("orderField", columns.get(1).getActualColumnName());
+	
+		// column.getRemarks 备注
+		
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println(JSONObject.toJSONString(paramMap));
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+		
+		String content = null;
+		try {
+			content = new VelocityUtil().createMailContent("controller", paramMap);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("========================================================================================");
+		
+		System.out.println(content);
+		
+		System.out.println("========================================================================================");
+		
+	}
+	
+	
+	
+	public void genJSP(){
+		
+	}
+	
+	// Actual Column Name: qu_type_id, JDBC Type: 1, Nullable: false, Length: 32, Scale: 0, Identity: false, 
+	// Actual Column Name: qu_type_name, JDBC Type: 1, Nullable: true, Length: 32, Scale: 0, Identity: false, 
+	// Actual Column Name: create_date, JDBC Type: 93, Nullable: true, Length: 19, Scale: 0, Identity: false
 	
 //	table = d.money.pojo.base.BaseQuTag
 //	tableName = BaseQuTag
