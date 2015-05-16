@@ -1,0 +1,246 @@
+package d.money.web.controller.back;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import d.money.common.constant.BackGlobalConstant;
+import d.money.common.utils.IDUtil;
+import d.money.common.utils.PageUtil;
+import d.money.common.utils.StringUtil;
+import d.money.pojo.BackAdminSessionInfo;
+import ${fullPojoJavaName};
+import ${fullPojoExampleJavaName};
+import ${fullServiceJavaName};
+
+@Controller
+public class ${controllerName} {
+
+    private static final String ACTIVE_FLAG_VAL = "${pojoJavaName}";
+
+	private static final String ACTIVE_FLAG = "activeFlag";
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    ${serviceJavaName} ${serviceObjName};
+    
+    /**
+     * 修改页初始化
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/${pojoObjName}UpdateInit")
+    public ModelAndView ${pojoObjName}UpdateInit(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	BackAdminSessionInfo adminSessionInfo = (BackAdminSessionInfo) request.getSession().getAttribute(BackGlobalConstant.ADMIN_SESSION_KEY);
+    	
+    	if (adminSessionInfo == null) {
+    		return new ModelAndView("redirect:/sys_login.jsp");
+    	}
+    	
+    	// 主键ID
+    	String pkId = request.getParameter("pkId");
+    	// 分页
+    	String currentPageStr = request.getParameter("currentPage");
+    	
+    	${pojoJavaName} ${pojoObjName} = ${serviceObjName}.selectByPrimaryKey(pkId);
+    	
+    	request.setAttribute("${pojoObjName}", ${pojoObjName});
+    	request.setAttribute("currentPage", currentPageStr);
+    	request.setAttribute(ACTIVE_FLAG, ACTIVE_FLAG_VAL);
+    	
+    	return new ModelAndView("back/${table_name}_update");
+    }
+    
+    /**
+     * 修改分类
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/${pojoObjName}Update")
+    public void ${pojoObjName}Update(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	BackAdminSessionInfo adminSessionInfo = (BackAdminSessionInfo) request.getSession().getAttribute(BackGlobalConstant.ADMIN_SESSION_KEY);
+    	
+    	if (adminSessionInfo == null) {
+    		return;
+    	}
+    	
+    	// 验证、保存数据
+    	${pojoJavaName} ${pojoObjName} = new ${pojoJavaName}();
+    	
+    	// 循环按字段set值
+    	// TODO 不同类型需要强制转换
+    	#foreach(${pojoField} in ${pojoFieldList})
+    	
+    	${pojoObjName}.set${util.toFirstUpperClass(${pojoField})}(request.getParameter("${pojoField}"));
+    	#end
+    	
+    	${serviceObjName}.updateByPrimaryKeySelective(${pojoObjName});
+    	
+    	try {
+			response.getWriter().print("success");
+		} catch (IOException e) {
+			e.printStackTrace();
+		};
+    }
+    
+    /**
+     * 新增页初始化
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/${pojoObjName}AddInit")
+    public ModelAndView ${pojoObjName}AddInit(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	BackAdminSessionInfo adminSessionInfo = (BackAdminSessionInfo) request.getSession().getAttribute(BackGlobalConstant.ADMIN_SESSION_KEY);
+    	
+    	if (adminSessionInfo == null) {
+    		return new ModelAndView("redirect:/sys_login.jsp");
+    	}
+    	request.setAttribute(ACTIVE_FLAG, ACTIVE_FLAG_VAL);
+    	
+    	return new ModelAndView("back/${table_name}_add");
+    }
+    
+    /**
+     * 新增数据
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/${pojoObjName}Add")
+    public void ${pojoObjName}Add(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	BackAdminSessionInfo adminSessionInfo = (BackAdminSessionInfo) request.getSession().getAttribute(BackGlobalConstant.ADMIN_SESSION_KEY);
+    	
+    	if (adminSessionInfo == null) {
+    		return;
+    	}
+    	
+    	// 验证、保存数据
+    	${pojoJavaName} ${pojoObjName} = new ${pojoJavaName}();
+    	
+    	// 循环按字段set值
+    	// TODO 不同类型需要强制转换
+    	#foreach(${pojoField} in ${pojoFieldList})
+    	
+    	${pojoObjName}.set${util.toFirstUpperClass(${pojoField})}(request.getParameter("${pojoField}"));
+    	#end
+    	
+    	#* 
+    	#if(isPk()){
+    	     ${pojoObjName}.set${pojoField}(IDUtil.getID());
+    	}
+    	#if(isCreateDate()){
+    	     ${pojoObjName}.setCreateDate(new Date());
+    	}
+    	*#
+    	
+    	
+    	
+    	${serviceObjName}.insert(${pojoObjName});
+    	request.setAttribute(ACTIVE_FLAG, ACTIVE_FLAG_VAL);
+    	
+    	try {
+			response.getWriter().print("success");
+		} catch (IOException e) {
+			e.printStackTrace();
+		};
+    }
+    
+    /**
+     * 查
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/${pojoObjName}List")
+    public ModelAndView ${pojoObjName}List(HttpServletRequest request, HttpServletResponse response) {
+
+        BackAdminSessionInfo adminSessionInfo = (BackAdminSessionInfo) request.getSession().getAttribute(BackGlobalConstant.ADMIN_SESSION_KEY);
+        
+        if (adminSessionInfo == null) {
+            return new ModelAndView("redirect:/sys_login.jsp");
+        }
+        
+        // 从请求参数中取得当前页码
+        String currentPageStr = request.getParameter("page");
+        
+        // 默认为第一页
+        int currentPage = 1;
+        // 每页显示条数
+        int perpage = 10;
+        
+        if (StringUtil.isNotEmpty(currentPageStr)) {
+            currentPage = Integer.valueOf(currentPageStr);
+        }
+        
+        ${pojoExampleJavaName} ${pojoExampleObjName} = new ${pojoExampleJavaName}();
+        ${pojoExampleObjName}.setOrderByClause("${orderField} asc");
+        
+        ${pojoExampleObjName}.setMysqlOffset(PageUtil.getStartRecord(currentPage, perpage));
+        ${pojoExampleObjName}.setMysqlLength(perpage);
+        
+        List<${pojoJavaName}> ${pojoObjListName} = ${serviceObjName}.selectByExample(${pojoExampleObjName});
+        
+        int total = ${serviceObjName}.countByExample(${pojoExampleObjName});
+        
+        // 分页请求数据URL地址
+        String url = "${pojoObjName}List?";
+       
+        // 取得分页工具条
+        String pageHtml = PageUtil.getBackPageHtml(currentPage, perpage, total, url);
+       
+        request.setAttribute("${pojoObjListName}", ${pojoObjListName});
+        request.setAttribute("pageHtml", pageHtml);
+        
+        request.setAttribute(ACTIVE_FLAG, ACTIVE_FLAG_VAL);
+        
+        return new ModelAndView("back/${table_name}_list");
+    }
+    
+    /**
+     * 删除
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/${pojoObjName}Delete")
+    public void ${pojoObjName}Delete(HttpServletRequest request, HttpServletResponse response) {
+    	
+        BackAdminSessionInfo adminSessionInfo = (BackAdminSessionInfo) request.getSession().getAttribute(BackGlobalConstant.ADMIN_SESSION_KEY);
+        
+        if (adminSessionInfo == null) {
+            return;
+        }
+        
+        String pkId = request.getParameter("pkId");
+        
+        if (StringUtil.isNotEmpty(pkId)) {
+        	
+        	// TODO 不使用物理删除
+        	${serviceObjName}.deleteByPrimaryKey(pkId);
+        }
+        
+        try {
+			response.getWriter().print("success");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+}
