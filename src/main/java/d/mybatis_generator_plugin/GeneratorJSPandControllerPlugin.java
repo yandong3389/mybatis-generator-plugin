@@ -9,15 +9,9 @@ import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
-import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.Interface;
-import org.mybatis.generator.api.dom.java.JavaElement;
-import org.mybatis.generator.api.dom.java.JavaVisibility;
-import org.mybatis.generator.api.dom.java.Method;
-import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
-import org.mybatis.generator.internal.util.StringUtility;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -146,7 +140,9 @@ public class GeneratorJSPandControllerPlugin extends PluginAdapter {
 	public void genFiles(IntrospectedTable introspectedTable){
 		   
 		genController(introspectedTable);
-		
+		genJSP(introspectedTable);
+		genJS(introspectedTable);
+		genCSS(introspectedTable);
 	}
 	
 	public void genController(IntrospectedTable introspectedTable){
@@ -230,8 +226,16 @@ public class GeneratorJSPandControllerPlugin extends PluginAdapter {
 	
 	
 	
-	public void genJSP(){
-		
+	public void genJSP(IntrospectedTable introspectedTable){
+		// TODO 
+	}
+	
+	public void genJS(IntrospectedTable introspectedTable){
+		// TODO 
+	}
+	
+	public void genCSS(IntrospectedTable introspectedTable){
+		// TODO 
 	}
 	
 	// Actual Column Name: qu_type_id, JDBC Type: 1, Nullable: false, Length: 32, Scale: 0, Identity: false, 
