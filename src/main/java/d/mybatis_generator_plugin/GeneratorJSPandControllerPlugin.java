@@ -228,6 +228,7 @@ public class GeneratorJSPandControllerPlugin extends PluginAdapter {
 	
 	public void genJSP(IntrospectedTable introspectedTable){
 		// TODO 
+		System.out.println("1111");
 	}
 	
 	public void genJS(IntrospectedTable introspectedTable){
